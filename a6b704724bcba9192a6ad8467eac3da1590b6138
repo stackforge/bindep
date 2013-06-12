@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Approved+1: lifeless <robertc@robertcollins.net>
+Code-Review+2: lifeless <robertc@robertcollins.net>
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Jun 2013 03:11:06 +0000
+Reviewed-on: https://review.openstack.org/32676
+Project: stackforge/bindep
+Branch: refs/heads/master
