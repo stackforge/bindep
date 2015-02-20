@@ -133,6 +133,9 @@ class Depends(object):
         if distro in ["debian", "ubuntu"]:
             atoms.add("dpkg")
             self.platform = Dpkg()
+        elif distro in ["centos"]
+            atoms.add("rpm")
+            self.platform = Rpm()
         return ["platform:%s" % (atom,) for atom in sorted(atoms)]
 
 
@@ -171,6 +174,30 @@ class Dpkg(Platform):
         if elements[3] != 'installed':
             return None
         return elements[4]
+
+
+class Rpm(Platform):
+    """rpm specific platform implementation.
+
+    This shells out to rpm.
+    """
+
+    def get_pkg_version(self, pkg_name):
+        try:
+            output = subprocess.check_output(
+                ["rpm", "-qf",
+                 "%{NAME} %{VERSION}-%{RELEASE}\n", "-q",
+                 pkg_name], stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            if (e.returncode == 1 and
+                e.output.endswith('is not installed')):
+                return None
+            raise
+        # output looks like
+        # name version
+        output = output.strip()
+        elements = output.split(' ')
+        return elements[1]
 
 
 def _eval_diff(operator, diff):
