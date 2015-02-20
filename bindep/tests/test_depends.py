@@ -47,6 +47,12 @@ class TestDepends(TestCase):
         subprocess.check_output(
             ["lsb_release", "-si"],
             stderr=subprocess.STDOUT).AndReturn("%s\n" % platform)
+        subprocess.check_output(
+            ["lsb_release", "-sc"],
+            stderr=subprocess.STDOUT).AndReturn("trusty\n")
+        subprocess.check_output(
+            ["lsb_release", "-sr"],
+            stderr=subprocess.STDOUT).AndReturn("14.04\n")
         mocker.ReplayAll()
         self.addCleanup(mocker.VerifyAll)
         self.addCleanup(mocker.UnsetStubs)
