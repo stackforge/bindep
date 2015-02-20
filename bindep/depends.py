@@ -129,7 +129,13 @@ class Depends(object):
     def platform_profiles(self):
         distro = subprocess.check_output(
             ["lsb_release", "-si"], stderr=subprocess.STDOUT).strip().lower()
+        codename = subprocess.check_output(
+            ["lsb_release", "-sc"], stderr=subprocess.STDOUT).strip().lower()
+        release = subprocess.check_output(
+            ["lsb_release", "-sr"], stderr=subprocess.STDOUT).strip().lower()
         atoms = set([distro])
+        atoms.add("codename")
+        atoms.add("release")
         if distro in ["debian", "ubuntu"]:
             atoms.add("dpkg")
             self.platform = Dpkg()
