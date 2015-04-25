@@ -15,6 +15,14 @@
 # limitations under the License.
 
 import setuptools
+import sys
+
+#print(sys.argv)
+#sys.exit(1)
+
+if sys.argv[0].endswith('setup.py') and 'install' in sys.argv:
+    sys.stderr.write('\nERROR: This project does not support easy_install.\n')
+    sys.exit(1)
 
 # In python < 2.7.4, a lazy loading of package `pbr` will break
 # setuptools if some other modules registered functions in `atexit`.
