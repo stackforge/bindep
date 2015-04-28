@@ -189,6 +189,7 @@ class TestDepends(TestCase):
         depends = Depends(dedent("""\
             foo
             bar [something]
+            baz [platform:this platform:that-those]
             quux [anotherthing !nothing] <=12
             """))
 
