@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import optparse
 import os
+import sys
 from textwrap import dedent
 
 from fixtures import FakeLogger
@@ -26,6 +28,7 @@ import mox
 from testtools import TestCase
 
 from bindep.depends import Depends
+from bindep.main import get_version
 from bindep.main import main
 
 
@@ -42,6 +45,14 @@ class MainFixture(Fixture):
         self.path = self.useFixture(TempDir()).path
         self.addCleanup(os.chdir, self.path)
         os.chdir(self.path)
+
+
+class NonExitingOptionParser(optparse.OptionParser):
+    """A variant of OptionParser which does not call sys.exit()."""
+
+    def exit(self, status=0, msg=None):
+        if msg:
+            sys.stderr.write(msg)
 
 
 class TestMain(TestCase):
@@ -168,3 +179,10 @@ class TestMain(TestCase):
             """), logger.output)
         self.addCleanup(mocker.VerifyAll)
         self.addCleanup(mocker.UnsetStubs)
+
+    def test_cli_version(self):
+        fixture = self.useFixture(MainFixture())
+        self.useFixture(MonkeyPatch('sys.argv', ['bindep', '--version']))
+        self.assertEqual(
+            0, main(noop=True, optionParser=NonExitingOptionParser))
+        self.assertEqual("bindep %s\n" % get_version(), fixture.logger.output)

@@ -17,6 +17,7 @@
 
 import logging
 import optparse
+import pkg_resources
 import sys
 
 from bindep.depends import Depends
@@ -26,8 +27,14 @@ logging.basicConfig(
     stream=sys.stdout, level=logging.INFO, format="%(message)s")
 
 
-def main(depends=None):
-    parser = optparse.OptionParser()
+def get_version():
+    requirement = pkg_resources.Requirement.parse('bindep')
+    provider = pkg_resources.get_provider(requirement)
+    return provider.version
+
+
+def main(depends=None, noop=False, optionParser=optparse.OptionParser):
+    parser = optionParser(version="%%prog %s" % get_version())
     parser.add_option(
         "-b", "--brief", action="store_true", dest="brief",
         help="List only missing packages one per line.")
@@ -39,6 +46,8 @@ def main(depends=None):
         "--profiles", action="store_true",
         help="List the platform and configuration profiles.")
     opts, args = parser.parse_args()
+    if noop:
+        return 0
     if depends is None:
         try:
             content = open(opts.filename, 'rt').read()
