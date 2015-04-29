@@ -17,6 +17,7 @@
 
 import logging
 import optparse
+import pbr.version
 import sys
 
 from bindep.depends import Depends
@@ -26,8 +27,12 @@ logging.basicConfig(
     stream=sys.stdout, level=logging.INFO, format="%(message)s")
 
 
+def get_version():
+    return pbr.version.VersionInfo('bindep').release_string()
+
+
 def main(depends=None):
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(version="%%prog %s" % get_version())
     parser.add_option(
         "-b", "--brief", action="store_true", dest="brief",
         help="List only missing packages one per line.")
