@@ -191,6 +191,10 @@ class TestDepends(TestCase):
             bar [something]
             baz [platform:this platform:that-those]
             quux [anotherthing !nothing] <=12
+            womp # and a comment
+            # a standalone comment and a blank line
+
+            # all's ok? good then
             """))
 
     def test_parser_invalid(self):

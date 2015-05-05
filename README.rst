@@ -48,7 +48,7 @@ Writing Requirements Files
 The requirements file ``other-requirements.txt`` lists the dependencies for
 projects. Where non-ascii characters are needed, they should be UTF8 encoded.
 
-The file is line orientated - each line is a Debian binary package name, an
+The file is line orientated - each non-blank line is a Debian binary package name, an
 optional profile selector and optional version constraints. (Note - if you are
 writing an alternative parser, see the Debian policy manual for the parsing
 rules for packagenames). Debian package names are used as a single source of
@@ -74,6 +74,9 @@ when running in a RHEL linux environment.
 Version constraints are a comma separated list of constraints where each
 constraint is  (== | < | <= | >= | > | !=) VERSION, and the constraints are ANDed
 together (the same as pip requirements version constraints).
+
+Comments are allowed: everything from the first ``#`` to the end of the line is
+ignored.
 
 Developing bindep
 =================
