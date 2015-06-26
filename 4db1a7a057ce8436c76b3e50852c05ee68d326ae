@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 26 Jun 2015 12:43:44 +0000
+Reviewed-on: https://review.openstack.org/195201
+Project: openstack-infra/bindep
+Branch: refs/heads/master
