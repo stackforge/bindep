@@ -27,7 +27,8 @@ specific filename with the -f/--file command line option. If you want to read
 the list from standard input in a pipeline instead, use a filename of "-".
 
 When bindep runs, its exit code is ``0`` if no described packages are missing,
-but ``1`` if there are packages which it believes need to be installed.
+but ``2`` if there are packages which it believes need to be installed. If
+there is an execution error for some reason, it exits ``1``.
 
 Profiles
 --------

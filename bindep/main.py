@@ -80,7 +80,7 @@ def main(depends=None):
                             "    %s version %s does not match %s",
                             pkg, version, constraint)
         if errors:
-            return 1
+            return 2
     return 0
 
 
