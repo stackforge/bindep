@@ -26,8 +26,11 @@ If you need to maintain multiple requirements list files you can pass a
 specific filename with the -f/--file command line option. If you want to read
 the list from standard input in a pipeline instead, use a filename of "-".
 
-When bindep runs, its exit code is ``0`` if no described packages are missing,
-but ``1`` if there are packages which it believes need to be installed.
+To use bindep in a script where you want to easily determine whether all
+listed requirements are satisfied, your can use the --exit-code option to make
+it exit with codes similar to diff(1). In particular, it will exit 1 if there
+are missing packages or bad versions detected, but will exit 0 if all
+requirements are already present.
 
 Profiles
 --------

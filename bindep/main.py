@@ -32,6 +32,9 @@ def main(depends=None):
         "-b", "--brief", action="store_true", dest="brief",
         help="List only missing packages one per line.")
     parser.add_option(
+        "--exit-code", action="store_true", dest="exitcode",
+        help="Exit nonzero for missing packages or bad versions.")
+    parser.add_option(
         "-f", "--file", action="store", type="string", dest="filename",
         default="other-requirements.txt",
         help="Package list file (default: other-requirements.txt).")
@@ -79,7 +82,7 @@ def main(depends=None):
                         logging.info(
                             "    %s version %s does not match %s",
                             pkg, version, constraint)
-        if errors:
+        if opts.exitcode and errors:
             return 1
     return 0
 
