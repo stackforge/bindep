@@ -174,3 +174,28 @@ class TestMain(TestCase):
             """), logger.output)
         self.addCleanup(mocker.VerifyAll)
         self.addCleanup(mocker.UnsetStubs)
+
+    def test_exit_code_nonbrief(self):
+        self.useFixture(MonkeyPatch('sys.argv', ['bindep', '--exit-code']))
+        mocker = mox.Mox()
+        depends = mocker.CreateMock(Depends)
+        depends.platform_profiles().AndReturn([])
+        depends.active_rules(["default"]).AndReturn([])
+        depends.check_rules([]).AndReturn([('missing', ['foo'])])
+        mocker.ReplayAll()
+        self.assertEqual(2, main(depends=depends))
+        self.addCleanup(mocker.VerifyAll)
+        self.addCleanup(mocker.UnsetStubs)
+
+    def test_exit_code_brief(self):
+        self.useFixture(
+            MonkeyPatch('sys.argv', ['bindep', '--exit-code', '--brief']))
+        mocker = mox.Mox()
+        depends = mocker.CreateMock(Depends)
+        depends.platform_profiles().AndReturn([])
+        depends.active_rules(["default"]).AndReturn([])
+        depends.check_rules([]).AndReturn([('missing', ['foo'])])
+        mocker.ReplayAll()
+        self.assertEqual(2, main(depends=depends))
+        self.addCleanup(mocker.VerifyAll)
+        self.addCleanup(mocker.UnsetStubs)

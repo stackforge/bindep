@@ -31,7 +31,9 @@ but ``2`` if there are packages which it believes need to be installed. If
 there is an execution error for some reason, it exits ``1``. An exception is
 -b/--brief mode, where the exit code is also ``0`` for missing packages and bad
 versions so that it's suitable for use in scripts which may abort early on any
-commands exiting nonzero.
+commands exiting nonzero. It's still possible to override that exception and
+restore normal exit codes in brief mode; for this use the -e/--exit-code
+option.
 
 Profiles
 --------
