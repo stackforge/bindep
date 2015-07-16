@@ -167,7 +167,7 @@ class TestMain(TestCase):
             [('missing', ['foo', 'bar']),
              ('badversion', [('quux', '<=12', '13'), ('qaaz', '!=10', '10')])])
         mocker.ReplayAll()
-        self.assertEqual(2, main(depends=depends))
+        self.assertEqual(0, main(depends=depends))
         self.assertEqual(dedent("""\
             foo
             bar

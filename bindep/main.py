@@ -30,7 +30,7 @@ def main(depends=None):
     parser = optparse.OptionParser(version="%%prog %s" % bindep.version)
     parser.add_option(
         "-b", "--brief", action="store_true", dest="brief",
-        help="List only missing packages one per line.")
+        help="Only list missing packages, suitable for scripting.")
     parser.add_option(
         "-f", "--file", action="store", type="string", dest="filename",
         default="other-requirements.txt",
@@ -79,7 +79,7 @@ def main(depends=None):
                         logging.info(
                             "    %s version %s does not match %s",
                             pkg, version, constraint)
-        if errors:
+        if errors and not opts.brief:
             return 2
     return 0
 

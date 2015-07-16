@@ -28,7 +28,10 @@ the list from standard input in a pipeline instead, use a filename of "-".
 
 When bindep runs, its exit code is ``0`` if no described packages are missing,
 but ``2`` if there are packages which it believes need to be installed. If
-there is an execution error for some reason, it exits ``1``.
+there is an execution error for some reason, it exits ``1``. An exception is
+-b/--brief mode, where the exit code is also ``0`` for missing packages and bad
+versions so that it's suitable for use in scripts which may abort early on any
+commands exiting nonzero.
 
 Profiles
 --------
