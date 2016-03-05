@@ -1,2 +1,9 @@
 python-virtualenv [test]
 python-tox [test]
+
+# Needed with current setup of gate jobs
+libmysqlclient-dev
+mysql-client
+mysql-server
+postgresql
+postgresql-client
