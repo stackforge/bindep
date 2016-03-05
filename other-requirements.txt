@@ -1,2 +1,7 @@
+libmysqlclient-dev
+mysql-client
+mysql-server
+postgresql
+postgresql-client
 python-virtualenv [test]
 python-tox [test]
