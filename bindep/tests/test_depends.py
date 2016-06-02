@@ -29,6 +29,7 @@ from bindep.depends import _eval
 from bindep.depends import Depends
 from bindep.depends import Dpkg
 from bindep.depends import Emerge
+from bindep.depends import Pacman
 from bindep.depends import Platform
 from bindep.depends import Rpm
 
@@ -291,6 +292,36 @@ class TestEmerge(TestCase):
         self.addCleanup(mocker.VerifyAll)
         self.addCleanup(mocker.UnsetStubs)
         self.assertEqual("4.0.0", platform.get_pkg_version("foo"))
+
+
+class TestPacman(TestCase):
+
+    def test_unknown_package(self):
+        platform = Pacman()
+        mocker = mox.Mox()
+        mocker.StubOutWithMock(subprocess, "check_output")
+        subprocess.check_output(
+            ['pacman', '-Q', 'foo'],
+            stderr=subprocess.STDOUT).AndRaise(
+                subprocess.CalledProcessError(
+                    1, [], "error: package 'foo' was not found"))
+        mocker.ReplayAll()
+        self.addCleanup(mocker.VerifyAll)
+        self.addCleanup(mocker.UnsetStubs)
+        self.assertEqual(None, platform.get_pkg_version("foo"))
+
+    def test_installed_version(self):
+        platform = Pacman()
+        mocker = mox.Mox()
+        mocker.StubOutWithMock(subprocess, "check_output")
+        subprocess.check_output(
+            ['pacman', '-Q', 'foo'],
+            stderr=subprocess.STDOUT).AndReturn(
+                "foo 4.0.0-2")
+        mocker.ReplayAll()
+        self.addCleanup(mocker.VerifyAll)
+        self.addCleanup(mocker.UnsetStubs)
+        self.assertEqual("4.0.0-2", platform.get_pkg_version("foo"))
 
 
 class TestRpm(TestCase):
