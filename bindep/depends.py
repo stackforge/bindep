@@ -15,8 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import locale
 from parsley import makeGrammar
 import subprocess
+
+
+encoding = locale.getdefaultlocale()[1]
 
 if not getattr(subprocess, 'check_output', None):
     import bindep.support_py26
@@ -130,8 +134,10 @@ class Depends(object):
         return sorted(profiles)
 
     def platform_profiles(self):
-        distro, release, codename = subprocess.check_output(
-            ["lsb_release", "-cirs"], stderr=subprocess.STDOUT).lower().split()
+        output = subprocess.check_output(
+            ["lsb_release", "-cirs"],
+            stderr=subprocess.STDOUT).decode(encoding)
+        distro, release, codename = output.lower().split()
         atoms = set([distro])
         atoms.add("%s-%s" % (distro, codename))
         releasebits = release.split(".")
@@ -170,7 +176,7 @@ class Dpkg(Platform):
         try:
             output = subprocess.check_output(
                 ["dpkg-query", "-W", "-f", "${Package} ${Status} ${Version}\n",
-                 pkg_name], stderr=subprocess.STDOUT)
+                 pkg_name], stderr=subprocess.STDOUT).decode(encoding)
         except subprocess.CalledProcessError as e:
             if (e.returncode == 1 and
                 (e.output.startswith('dpkg-query: no packages found') or
@@ -198,7 +204,7 @@ class Rpm(Platform):
             output = subprocess.check_output(
                 ["rpm", "--qf",
                  "%{NAME} %|EPOCH?{%{EPOCH}:}|%{VERSION}-%{RELEASE}\n", "-q",
-                 pkg_name], stderr=subprocess.STDOUT)
+                 pkg_name], stderr=subprocess.STDOUT).decode(encoding)
         except subprocess.CalledProcessError as e:
             if (e.returncode == 1 and
                 e.output.strip().endswith('is not installed')):
@@ -223,7 +229,7 @@ class Emerge(Platform):
         try:
             output = subprocess.check_output(
                 ['equery', 'l', '--format=\'$version\'', pkg_name],
-                stderr=subprocess.STDOUT)
+                stderr=subprocess.STDOUT).decode(encoding)
         except subprocess.CalledProcessError as e:
             if e.returncode == 3:
                 return None
