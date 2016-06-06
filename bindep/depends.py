@@ -17,6 +17,8 @@
 
 from parsley import makeGrammar
 import subprocess
+import six
+
 
 if not getattr(subprocess, 'check_output', None):
     import bindep.support_py26
@@ -130,8 +132,13 @@ class Depends(object):
         return sorted(profiles)
 
     def platform_profiles(self):
-        distro, release, codename = subprocess.check_output(
-            ["lsb_release", "-cirs"], stderr=subprocess.STDOUT).lower().split()
+        output = subprocess.check_output(
+            ["lsb_release", "-cirs"], stderr=subprocess.STDOUT)
+        # NOTE(notmorgan): Ensure everything is a string type not a binary
+        # type. This only applies to python 3 as in python 2 str == bytes.
+        if six.PY3 and isinstance(output, six.binary_type):
+            output = output.decode('utf-8')
+        distro, release, codename = output.lower().split()
         atoms = set([distro])
         atoms.add("%s-%s" % (distro, codename))
         releasebits = release.split(".")
