@@ -230,6 +230,51 @@ class TestDepends(TestCase):
         self.assertRaises(ometa.runtime.ParseError,
                           lambda: Depends("foo [platform:bar@baz]\n"))
 
+    def test_platforms(self):
+        depends = Depends(dedent("""\
+            install
+            install2 [test]
+            install3 [platform:rpm]
+            install4 [platform:dpkg]
+            install5 [quark]
+            install6 [platform:dpkg test]
+            install7 [quark test]
+            install8 [platform:dpkg platform:rpm]
+            install9 [platform:dpkg platform:rpm test]
+            installA [!platform:dpkg]
+            installB [!platform:dpkg test]
+            installC [!platform:dpkg !test]
+            installD [platform:dpkg !test]
+            """))
+
+        # Platform-only rules and rules with no platform are activated
+        # by a matching platform.
+        self.expectThat(
+            set(r[0] for r in depends.active_rules(['platform:dpkg'])),
+            Equals({"install", "install4", "install8", "installD"}))
+
+        # Non-platform rules matching one-or-more profiles plus any
+        # matching platform guarded rules.
+        self.expectThat(
+            set(r[0] for r in depends.active_rules(['platform:dpkg', 'test'])),
+            Equals({"install", "install2", "install4", "install6", "install7",
+                    "install8", "install9"}))
+
+        # When multiple platforms are present, none-or-any-platform is
+        # enough to match.
+        self.expectThat(
+            set(r[0] for r in depends.active_rules(['platform:rpm'])),
+            Equals({"install", "install3", "install8", "installA",
+                    "installC"}))
+
+        # If there are any platform profiles on a rule one of them
+        # must match an active platform even when other profiles match
+        # for the rule to be active.
+        self.expectThat(
+            set(r[0] for r in depends.active_rules(['platform:rpm', 'test'])),
+            Equals({"install", "install2", "install3", "install7", "install8",
+                    "install9", "installA", "installB"}))
+
 
 class TestDpkg(TestCase):
 
