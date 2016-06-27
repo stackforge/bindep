@@ -89,6 +89,11 @@ together (the same as pip requirements version constraints).
 Comments are allowed: everything from the first ``#`` to the end of the line is
 ignored.
 
+Note that platform selectors are treated as kind of filter: If a line
+contains a platform selector, then the package only gets installed if
+at least one of the platform selectors matches in addition to the
+match on the other selectors.
+
 Developing bindep
 =================
 
