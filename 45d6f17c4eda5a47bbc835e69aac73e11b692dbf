@@ -1,0 +1,11 @@
+Code-Review+1: Matthew Thode <mthode@mthode.org>
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: yolanda.robla <yroblamo@redhat.com>
+Workflow+1: yolanda.robla <yroblamo@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 27 Jun 2016 14:50:43 +0000
+Reviewed-on: https://review.openstack.org/315575
+Project: openstack-infra/bindep
+Branch: refs/heads/master
