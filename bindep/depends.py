@@ -83,20 +83,36 @@ class Depends(object):
             # Have we seen any positive selectors - if not, the absence of
             # negatives means we include the rule, but if we any positive
             # selectors we need a match.
+            # We need to handle platform profiles special: If any platform profile is true,
+            # the package gets included if the non-platform profiles are ok as well.
             positive = False
-            match_found = False
             negative = False
+            platform_match_found = False
+            other_match_found = False
+            has_platform = False
+            has_other = False
             for sense, profile in rule[1]:
                 if sense:
                     positive = True
-                    if profile in profiles:
-                        match_found = True
+                    if profile.startswith("platform:"):
+                        has_platform = True
+                        if profile in profiles:
+                            platform_match_found = True
+                    else:
+                        has_other = True
+                        if profile in profiles:
+                            other_match_found = True
                 else:
                     if profile in profiles:
                         negative = True
                         break
-            if not negative and (match_found or not positive):
-                result.append(rule)
+
+            if not negative:
+                if ((platform_match_found and other_match_found) or
+                    (not has_platform and other_match_found) or
+                    (not has_other and platform_match_found) or
+                    not positive):
+                    result.append(rule)
         return result
 
     def check_rules(self, rules):
@@ -130,8 +146,11 @@ class Depends(object):
         return sorted(profiles)
 
     def platform_profiles(self):
-        distro, release, codename = subprocess.check_output(
-            ["lsb_release", "-cirs"], stderr=subprocess.STDOUT).lower().split()
+        distro="ubuntu"
+        release="14.04"
+        codename="trusty"
+        #distro, release, codename = subprocess.check_output(
+        #    ["lsb_release", "-cirs"], stderr=subprocess.STDOUT).lower().split()
         atoms = set([distro])
         atoms.add("%s-%s" % (distro, codename))
         releasebits = release.split(".")
