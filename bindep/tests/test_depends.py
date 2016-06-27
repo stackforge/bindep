@@ -230,6 +230,66 @@ class TestDepends(TestCase):
         self.assertRaises(ometa.runtime.ParseError,
                           lambda: Depends("foo [platform:bar@baz]\n"))
 
+    def test_platforms(self):
+        depends = Depends(dedent("""\
+            install
+            install2 [test]
+            install3 [platform:rpm]
+            install4 [platform:dpkg]
+            install5 [quark]
+            install6 [platform:dpkg test]
+            install7 [quark test]
+            install8 [platform:dpkg platform:rpm]
+            install9 [platform:dpkg platform:rpm test]
+            """))
+        self.assertThat(
+            depends.active_rules(['platform:dpkg']),
+            MatchesSetwise(*map(
+                Equals,
+                [("install", [], []),
+                 ("install4", [(True, 'platform:dpkg')], []),
+                 ("install8", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm')], [])])))
+        self.assertThat(
+            depends.active_rules(['platform:dpkg', 'test']),
+            MatchesSetwise(*map(
+                Equals,
+                [("install", [], []),
+                 ("install2", [(True, 'test')], []),
+                 ("install4", [(True, 'platform:dpkg')], []),
+                 ("install6", [(True, 'platform:dpkg'),
+                               (True, 'test')], []),
+                 ("install7", [(True, 'quark'), (True, 'test')], []),
+                 ("install8", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm')], []),
+                 ("install9", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm'),
+                               (True, 'test')], [])])))
+
+        self.assertThat(
+            depends.active_rules(['platform:rpm']),
+            MatchesSetwise(*map(
+                Equals,
+                [("install", [], []),
+                 ("install3", [(True, 'platform:rpm')], []),
+                 ("install8", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm')], [])])))
+
+
+        self.assertThat(
+            depends.active_rules(['platform:rpm', 'test']),
+            MatchesSetwise(*map(
+                Equals,
+                [("install", [], []),
+                 ("install2", [(True, 'test')], []),
+                 ("install3", [(True, 'platform:rpm')], []),
+                 ("install7", [(True, 'quark'), (True, 'test')], []),
+                 ("install8", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm')], []),
+                 ("install9", [(True, 'platform:dpkg'),
+                               (True, 'platform:rpm'),
+                               (True, 'test')], [])])))
+
 
 class TestDpkg(TestCase):
 
