@@ -47,8 +47,11 @@ class TestDepends(TestCase):
         mocker = mox.Mox()
         mocker.StubOutWithMock(subprocess, "check_output")
         subprocess.check_output(
-            ["lsb_release", "-cirs"],
-            stderr=subprocess.STDOUT).AndReturn("%s\n14.04\ntrusty\n"
+            ["lsb_release", "-crs"],
+            stderr=subprocess.STDOUT).AndReturn("14.04\ntrusty\n")
+        subprocess.check_output(
+            ["lsb_release", "-is"],
+            stderr=subprocess.STDOUT).AndReturn("%s\n"
                                                 % platform)
         mocker.ReplayAll()
         self.addCleanup(mocker.VerifyAll)
@@ -65,6 +68,18 @@ class TestDepends(TestCase):
         depends = Depends("")
         self.assertThat(
             depends.platform_profiles(), Contains("platform:fedora"))
+
+    def test_detects_opensuse(self):
+        self._mock_lsb("openSUSE")
+        depends = Depends("")
+        self.assertThat(
+            depends.platform_profiles(), Contains("platform:opensuse"))
+
+    def test_detects_suselinux(self):
+        self._mock_lsb("SUSE Linux")
+        depends = Depends("")
+        self.assertThat(
+            depends.platform_profiles(), Contains("platform:suselinux"))
 
     def test_detects_ubuntu(self):
         self._mock_lsb("Ubuntu")

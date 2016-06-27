@@ -130,8 +130,12 @@ class Depends(object):
         return sorted(profiles)
 
     def platform_profiles(self):
-        distro, release, codename = subprocess.check_output(
-            ["lsb_release", "-cirs"], stderr=subprocess.STDOUT).lower().split()
+        release, codename = subprocess.check_output(
+            ["lsb_release", "-crs"], stderr=subprocess.STDOUT).lower().split()
+        # distro can contain spaces, therefore use separate command
+        distro = subprocess.check_output(
+            ["lsb_release", "-is"], stderr=subprocess.STDOUT).lower().strip()
+        distro = distro.replace(' ', '')
         atoms = set([distro])
         atoms.add("%s-%s" % (distro, codename))
         releasebits = release.split(".")
@@ -141,6 +145,9 @@ class Depends(object):
             atoms.add("dpkg")
             self.platform = Dpkg()
         elif distro in ["centos", "fedora"]:
+            atoms.add("rpm")
+            self.platform = Rpm()
+        elif distro in ["openSUSE", "SUSE Linux"]:
             atoms.add("rpm")
             self.platform = Rpm()
         elif distro in ["gentoo"]:
