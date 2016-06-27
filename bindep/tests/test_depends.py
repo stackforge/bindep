@@ -205,6 +205,22 @@ class TestDepends(TestCase):
                           lambda: Depends("foo [platform:bar@baz]\n"))
 
 
+    def test_platforms(self):
+        self._mock_lsb("Ubuntu")
+        # TODO(add another case using test profile)
+        depends = Depends(dedent("""\
+            install
+            install2 [test]
+            non-install3 [platform:rpm]
+            install4 [platform:dpkg]
+            non-install5 [quark]
+            install6 {platform:dpkg test]
+            """))
+        self.assertThat(
+            depends.profiles(),
+            MatchesSetwise(*map(
+                Equals, ["install", "install4"])))
+
 class TestDpkg(TestCase):
 
     def test_not_installed(self):
