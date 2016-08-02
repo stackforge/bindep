@@ -17,6 +17,7 @@
 
 import logging
 import optparse
+import os.path
 import sys
 
 import bindep.depends
@@ -36,7 +37,13 @@ def main(depends=None):
     parser.add_option(
         "-f", "--file", action="store", type="string", dest="filename",
         default="other-requirements.txt",
-        help="Package list file (default: other-requirements.txt).")
+        help="Primary package list file (default: other-requirements.txt).")
+    parser.add_option(
+        "-s", "--secondary_file", action="store", type="string",
+        dest="secondary_filename",
+        default="bindep.txt",
+        help="Secondary package list file, will be read if primary does not "
+             "exist (default: bindep.txt).")
     parser.add_option(
         "--profiles", action="store_true",
         help="List the platform and configuration profiles.")
@@ -45,11 +52,24 @@ def main(depends=None):
         if opts.filename == "-":
             fd = sys.stdin
         else:
-            try:
-                fd = open(opts.filename, 'rt')
-            except IOError:
-                logging.error('No %s file found.' % opts.filename)
+            if os.path.isfile(opts.filename):
+                try:
+                    fd = open(opts.filename, 'rt')
+                except IOError:
+                    logging.error('Error reading file %s.' % opts.filename)
+                    return 1
+            elif os.path.isfile(opts.secondary_filename):
+                try:
+                    fd = open(opts.secondary_filename, 'rt')
+                except IOError:
+                    logging.error('Error reading file %s.' %
+                                  opts.secondary_filename)
+                    return 1
+            else:
+                logging.error('Neither file %s nor file %s exist.' %
+                              (opts.filename, opts.secondary_filename))
                 return 1
+
         depends = bindep.depends.Depends(fd.read())
     if opts.profiles:
         logging.info("Platform profiles:")

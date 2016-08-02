@@ -18,6 +18,9 @@ dependencies. Users without `bindep` installed can consult the
 ``other-requirements.txt`` file by hand if they choose, or install `bindep`
 first and then use it.
 
+If no ``other-requirements.txt`` file exist, `bindep` will look at the
+secondary location ``bindep.txt``.
+
 The output from bindep is fairly verbose normally, but passing an option of
 -b/--brief outputs just the missing packages one per line, suitable for feeding
 to your package management tool of choice.
