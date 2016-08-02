@@ -71,7 +71,7 @@ class TestMain(TestCase):
         self.useFixture(MonkeyPatch('sys.argv', ['bindep']))
         self.assertEqual(1, main())
         self.assertEqual(
-            'No other-requirements.txt file found.\n', fixture.logger.output)
+            'Neither file other-requirements.txt nor file .bindeprc exist.\n', fixture.logger.output)
 
     def test_empty_requirements_file(self):
         fixture = self.useFixture(MainFixture())
@@ -79,7 +79,7 @@ class TestMain(TestCase):
         with open(fixture.path + '/other-requirements.txt', 'wt'):
             pass
         self.assertEqual(0, main())
-        self.assertEqual('', fixture.logger.output)
+        self.assertEqual('Reading file other-requirements.txt.\n', fixture.logger.output)
 
     def test_specific_requirements_file(self):
         fixture = self.useFixture(MainFixture())
@@ -88,7 +88,7 @@ class TestMain(TestCase):
         with open(fixture.path + '/alternative-requirements.txt', 'wt'):
             pass
         self.assertEqual(0, main())
-        self.assertEqual('', fixture.logger.output)
+        self.assertEqual('Reading file alternative-requirements.txt.\n', fixture.logger.output)
 
     def test_missing_specific_requirements_file(self):
         fixture = self.useFixture(MainFixture())
@@ -96,7 +96,7 @@ class TestMain(TestCase):
             'bindep', '--file', 'alternative-requirements.txt']))
         self.assertEqual(1, main())
         self.assertEqual(
-            'No alternative-requirements.txt file found.\n',
+            'Neither file alternative-requirements.txt nor file .bindeprc exist.\n',
             fixture.logger.output)
 
     def test_stdin_requirements_file(self):
