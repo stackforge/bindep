@@ -99,6 +99,46 @@ together (the same as pip requirements version constraints).
 Comments are allowed: everything from the first ``#`` to the end of the line is
 ignored.
 
+Examples
+--------
+
+This section gives some examples as used in the `default bindep file
+<http://git.openstack.org/cgit/openstack-infra/project-config/tree/jenkins/data/bindep-fallback.txt>`_
+that OpenStack CI takes if no ``bindep.txt`` file exists for setup of
+some jobs.
+
+If a repository needs for deployment the libxml2 development
+libraries for support of Debian, Gentoo, and RPM based distros, the
+``bindep.txt`` file can contain::
+
+    libxml2-dev [platform:dpkg]
+    libxml2-devel [platform:rpm]
+    libxml2-utils [platform:dpkg]
+    dev-libs/libxml2 [platform:gentoo]
+
+This would select ``libxml2-dev`` and ``libxml2-utils`` packages
+on Debian based distributions like Debian and Ubuntu, ``libxml2-devel`` on
+RPM based distributions like CentOS, Fedora, openSUSE, Red Hat, or
+SUSE Linux, and ``dev-libs/libxmls2`` on Gentoo.
+
+To select Python3 development packages, the OpenStack CI default file uses::
+
+    python3-all-dev [platform:dpkg !platform:ubuntu-precise]
+    python3-devel [platform:fedora]
+    python34-devel [platform:centos]
+
+This selects ``python3-all-dev`` on all Debian based distributions
+with the exception of Ubuntu Precise, ``python3-devel`` on Fedora and
+``python34-devel`` on CentOS.
+
+To select the curl package, the OpenStack CI default file uses::
+
+    curl [!platform:gentoo]
+    net-misc/curl [platform:gentoo]
+
+This selects the ``curl`` package on all distributions with the
+exception of Gentoo, and selects ``net-misc/curl`` on Gentoo only.
+
 Developing bindep
 =================
 
