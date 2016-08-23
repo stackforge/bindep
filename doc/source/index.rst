@@ -13,6 +13,7 @@ Contents:
    news
    installation
    usage
+   openstack-ci-usage
    contributing
 
 Indices and tables

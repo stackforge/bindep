@@ -32,6 +32,8 @@ the list from standard input in a pipeline instead, use a filename of "-".
 When bindep runs, its exit code is ``0`` if no described packages are missing,
 but ``1`` if there are packages which it believes need to be installed.
 
+.. _profiles:
+
 Profiles
 --------
 
