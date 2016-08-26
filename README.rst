@@ -8,6 +8,10 @@ heavily on `pip` for installation of Python dependencies, some dependencies are
 not Python based, and particularly for testing, some dependencies have to be
 installed before `pip` can be used - such as `virtualenv` and `pip` itself.
 
+For more information on how OpenStack uses bindep, see the `OpenStack
+Infra Manual
+<http://docs.openstack.org/infra/manual/drivers.html#package-requirements>`_.
+
 Basics
 ======
 
