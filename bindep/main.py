@@ -18,6 +18,7 @@
 import logging
 import optparse
 import os.path
+import re
 import sys
 
 import bindep.depends
@@ -25,6 +26,56 @@ import bindep.depends
 
 logging.basicConfig(
     stream=sys.stdout, level=logging.INFO, format="%(message)s")
+
+
+version_constraint_regex = re.compile(r'(?P<op>[><=!]+)(?P<version>.*)')
+
+
+def _convert_ne_constraint(args, platform):
+    args = args.copy()
+    args['gt'] = _OP_DISTRO_MAP.get(platform, {}).get('>', '>')
+    args['lt'] = _OP_DISTRO_MAP.get(platform, {}).get('<', '<')
+    return '%(pkg)s %(lt)s %(version)s or %(pkg)s %(gt)s %(version)s' % args
+
+
+_OP_DISTRO_MAP = {
+    'platform:rpm': {
+        '==': '=',
+        '!=': _convert_ne_constraint,
+    },
+    'platform:dpkg': {
+        '==': '=',
+        # > and < are deprecated for dpkg
+        '>': '>>',
+        '<': '<<',
+        '!=': _convert_ne_constraint,
+    },
+}
+
+
+def _get_versioned_constraint(pkg, constraint, platform_profiles):
+    current_platform = None
+    try:
+        current_platform = next(p for p in platform_profiles
+                                if p in _OP_DISTRO_MAP)
+    except StopIteration:
+        pass
+
+    m = version_constraint_regex.match(constraint)
+    op = m.group('op')
+
+    # apply any platform specific rules to construct operation match
+    op = _OP_DISTRO_MAP.get(current_platform, {}).get(op, op)
+
+    args = {
+        'pkg': pkg,
+        'op': op,
+        'version': m.group('version'),
+    }
+
+    if callable(op):
+        return op(args, current_platform)
+    return '%(pkg)s %(op)s %(version)s' % args
 
 
 def main(depends=None):
@@ -89,7 +140,8 @@ def main(depends=None):
             profiles = args
         else:
             profiles = ["default"]
-        profiles = profiles + depends.platform_profiles()
+        platform_profiles = depends.platform_profiles()
+        profiles += platform_profiles
         rules = depends.active_rules(profiles)
         errors = depends.check_rules(rules)
         for error in errors:
@@ -106,6 +158,17 @@ def main(depends=None):
                         logging.info(
                             "    %s version %s does not match %s",
                             pkg, version, constraint)
+                else:
+                    for pkg, constraint, version in error[1]:
+                        logging.info(
+                            # add quotes because we need to pass the result
+                            # with space chars
+                            "'%s'",
+                            # we split constraint to insert a space between the
+                            # operator and the version number (required by
+                            # package managers like yum)
+                            _get_versioned_constraint(
+                                pkg, constraint, platform_profiles))
         if errors:
             return 1
     return 0
