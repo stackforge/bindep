@@ -27,6 +27,10 @@ logging.basicConfig(
     stream=sys.stdout, level=logging.INFO, format="%(message)s")
 
 
+def _split_constraint(constraint):
+    return constraint.rsplit('=', 1)
+
+
 def main(depends=None):
     usage = "Usage: %prog [options] [profile]"
     parser = optparse.OptionParser(
@@ -106,6 +110,16 @@ def main(depends=None):
                         logging.info(
                             "    %s version %s does not match %s",
                             pkg, version, constraint)
+                else:
+                    for pkg, constraint, version in error[1]:
+                        logging.info(
+                            # add quotes because we need to pass the result
+                            # with space chars
+                            "'%s'",
+                            # we split constraint to insert a space between the
+                            # operator and the version number (required by
+                            # package managers like yum)
+                            ' '.join([pkg] +_split_constraint(constraint)))
         if errors:
             return 1
     return 0
