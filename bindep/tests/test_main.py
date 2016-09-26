@@ -163,12 +163,91 @@ class TestMain(TestCase):
         depends.active_rules.return_value = []
         depends.check_rules.return_value = [
             ('missing', ['foo', 'bar']),
-            ('badversion', [('quux', '<=12', '13'), ('qaaz', '!=10', '10')])]
+            ('badversion', [
+                ('quuu', '<20', '25'),
+                ('quua', '<20', '20'),
+                ('quuv', '>15', '14'),
+                ('quub', '>15', '15'),
+                ('quuw', '==15', '17'),
+                ('quux', '<=12', '13'),
+                ('quuy', '>=20', '19'),
+                ('quuz', '!=10', '10'),
+            ])]
         self.assertEqual(1, main(depends=depends))
         self.assertEqual(dedent("""\
             foo
             bar
+            'quuu < 20'
+            'quua < 20'
+            'quuv > 15'
+            'quub > 15'
+            'quuw == 15'
+            'quux <= 12'
+            'quuy >= 20'
+            'quuz != 10'
             """), logger.output)
         depends.platform_profiles.assert_called_once_with()
         depends.active_rules.assert_called_once_with(["default"])
         depends.check_rules.assert_called_once_with([])
+
+    def test_brief_mode_dpkg(self):
+        logger = self.useFixture(FakeLogger())
+        self.useFixture(MonkeyPatch('sys.argv', ['bindep', '--brief']))
+        depends = mock.MagicMock()
+        depends.platform_profiles.return_value = ['platform:dpkg']
+        depends.check_rules.return_value = [
+            ('missing', ['foo', 'bar']),
+            ('badversion', [
+                ('quuu', '<20', '25'),
+                ('quua', '<20', '20'),
+                ('quuv', '>15', '14'),
+                ('quub', '>15', '15'),
+                ('quuw', '==15', '17'),
+                ('quux', '<=12', '13'),
+                ('quuy', '>=20', '19'),
+                ('quuz', '!=10', '10'),
+            ])]
+        self.assertEqual(1, main(depends=depends))
+        self.assertEqual(dedent("""\
+            foo
+            bar
+            'quuu << 20'
+            'quua << 20'
+            'quuv >> 15'
+            'quub >> 15'
+            'quuw = 15'
+            'quux <= 12'
+            'quuy >= 20'
+            'quuz << 10 or quuz >> 10'
+            """), logger.output)
+
+    def test_brief_mode_rpm(self):
+        logger = self.useFixture(FakeLogger())
+        self.useFixture(MonkeyPatch('sys.argv', ['bindep', '--brief']))
+        depends = mock.MagicMock()
+        depends.platform_profiles.return_value = ['platform:rpm']
+        depends.check_rules.return_value = [
+            ('missing', ['foo', 'bar']),
+            ('badversion', [
+                ('quuu', '<20', '25'),
+                ('quua', '<20', '20'),
+                ('quuv', '>15', '14'),
+                ('quub', '>15', '15'),
+                ('quuw', '==15', '17'),
+                ('quux', '<=12', '13'),
+                ('quuy', '>=20', '19'),
+                ('quuz', '!=10', '10'),
+            ])]
+        self.assertEqual(1, main(depends=depends))
+        self.assertEqual(dedent("""\
+            foo
+            bar
+            'quuu < 20'
+            'quua < 20'
+            'quuv > 15'
+            'quub > 15'
+            'quuw = 15'
+            'quux <= 12'
+            'quuy >= 20'
+            'quuz < 10 or quuz > 10'
+            """), logger.output)

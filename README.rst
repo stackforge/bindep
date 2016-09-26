@@ -25,6 +25,11 @@ The output from bindep is fairly verbose normally, but passing an option of
 -b/--brief outputs just the missing packages one per line, suitable for feeding
 to your package management tool of choice.
 
+.. note::
+   The brief output may require fresh package management tool on some systems.
+   For example, != operator is implemented with boolean dependencies on RPM
+   based distributions, that are supported starting from RPM 4.13 only.
+
 If you need to maintain multiple requirements list files you can pass a
 specific filename with the -f/--file command line option. If you want to read
 the list from standard input in a pipeline instead, use a filename of "-".
