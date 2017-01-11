@@ -1,0 +1,10 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 11 Jan 2017 18:47:02 +0000
+Reviewed-on: https://review.openstack.org/416227
+Project: openstack-infra/bindep
+Branch: refs/heads/master
