@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
 from locale import getpreferredencoding
 import logging
 import os.path
@@ -284,6 +285,34 @@ class Platform(object):
         """
         raise NotImplementedError(self.get_pkg_version)
 
+    @staticmethod
+    def get_pkg_version_impl(cmd, process_output, process_error):
+        """Executes cmd and calls the appropriate postprocess function
+
+        This function starts a subprocess using `cmd`.  If there is no
+        error during execution, `process_output` is called.  The only
+        parameter is the output from the `cmd`. The function must
+        return the version number.  If an error occurs, the
+        `process_error` function is called with the parameters e and
+        the already decoded output string.
+        """
+        try:
+            output = subprocess.check_output(
+                cmd,
+                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
+            return process_output(output)
+        except subprocess.CalledProcessError as e:
+            eoutput = e.output.decode(getpreferredencoding(False))
+            if process_error(e, eoutput):
+                return None
+            else:
+                raise
+
+    @staticmethod
+    def process_output_generic(field, output):
+        elements = output.strip().split(' ')
+        return elements[field]
+
 
 class Dpkg(Platform):
     """dpkg specific platform implementation.
@@ -292,25 +321,23 @@ class Dpkg(Platform):
     """
 
     def get_pkg_version(self, pkg_name):
-        try:
-            output = subprocess.check_output(
-                ["dpkg-query", "-W", "-f", "${Package} ${Status} ${Version}\n",
-                 pkg_name],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except subprocess.CalledProcessError as e:
-            eoutput = e.output.decode(getpreferredencoding(False))
-            if (e.returncode == 1 and
-                (eoutput.startswith('dpkg-query: no packages found') or
-                 eoutput.startswith('No packages found matching'))):
+
+        def process_output(output):
+            # output looks like
+            # name planned status install-status version
+            elements = output.strip().split(' ')
+            if elements[3] != 'installed':
                 return None
-            raise
-        # output looks like
-        # name planned status install-status version
-        output = output.strip()
-        elements = output.split(' ')
-        if elements[3] != 'installed':
-            return None
-        return elements[4]
+            return elements[4]
+
+        def process_error(e, eoutput):
+            return e.returncode == 1 \
+                and (eoutput.startswith('dpkg-query: no packages found') or
+                     eoutput.startswith('No packages found matching'))
+
+        return self.get_pkg_version_impl(
+            ["dpkg-query", "-W", "-f", "${Package} ${Status} ${Version}\n",
+             pkg_name], process_output, process_error)
 
 
 class Rpm(Platform):
@@ -321,24 +348,18 @@ class Rpm(Platform):
     """
 
     def get_pkg_version(self, pkg_name):
-        try:
-            output = subprocess.check_output(
-                ["rpm", "--qf",
-                 "%{NAME} %|EPOCH?{%{EPOCH}:}|%{VERSION}-%{RELEASE}\n",
-                 "--whatprovides", "-q", pkg_name],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except subprocess.CalledProcessError as e:
-            eoutput = e.output.decode(getpreferredencoding(False))
-            if (e.returncode == 1 and
-                (eoutput.strip().endswith('is not installed') or
-                 (eoutput.strip().startswith('no package provides')))):
-                return None
-            raise
+
+        def process_error(e, eoutput):
+            return e.returncode == 1 \
+                and (eoutput.strip().endswith('is not installed') or
+                     eoutput.strip().startswith('no package provides'))
+
         # output looks like
         # name version
-        output = output.strip()
-        elements = output.split(' ')
-        return elements[1]
+        return self.get_pkg_version_impl(
+            ["rpm", "--qf",
+             "%{NAME} %|EPOCH?{%{EPOCH}:}|%{VERSION}-%{RELEASE}\n", "-q",
+             pkg_name], partial(self.process_output_generic, 1), process_error)
 
 
 class Emerge(Platform):
@@ -350,19 +371,15 @@ class Emerge(Platform):
     """
 
     def get_pkg_version(self, pkg_name):
-        try:
-            output = subprocess.check_output(
-                ['equery', 'l', '--format=\'$version\'', pkg_name],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 3:
-                return None
-            raise
+
+        def process_error(e, eoutput):
+            return e.returncode == 3
+
         # output looks like
         # version
-        output = output.strip()
-        elements = output.split(' ')
-        return elements[0]
+        return self.get_pkg_version_impl(
+            ['equery', 'l', '--format=\'$version\'', pkg_name],
+            partial(self.process_output_generic, 0), process_error)
 
 
 class Pacman(Platform):
@@ -372,19 +389,15 @@ class Pacman(Platform):
     """
 
     def get_pkg_version(self, pkg_name):
-        try:
-            output = subprocess.check_output(
-                ['pacman', '-Q', pkg_name],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except subprocess.CalledProcessError as e:
-            eoutput = e.output.decode(getpreferredencoding(False))
-            if e.returncode == 1 and eoutput.endswith('was not found'):
-                return None
-            raise
+
+        def process_error(e, eoutput):
+            return e.returncode == 1 and eoutput.endswith('was not found')
+
         # output looks like
         # version
-        elements = output.strip().split(' ')
-        return elements[1]
+        return self.get_pkg_version_impl(
+            ['pacman', '-Q', pkg_name],
+            partial(self.process_output_generic, 1), process_error)
 
 
 def _eval_diff(operator, diff):
