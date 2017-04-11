@@ -419,7 +419,7 @@ class TestEmerge(TestCase):
         platform = Emerge()
 
         def _side_effect_raise(*args, **kwargs):
-            raise subprocess.CalledProcessError(3, [], '')
+            raise subprocess.CalledProcessError(3, [], b'')
 
         mocked_checkoutput = self.useFixture(
             fixtures.MockPatchObject(subprocess, 'check_output')).mock
@@ -434,7 +434,7 @@ class TestEmerge(TestCase):
         platform = Emerge()
 
         def _side_effect_raise(*args, **kwargs):
-            raise subprocess.CalledProcessError(3, [], '')
+            raise subprocess.CalledProcessError(3, [], b'')
 
         mocked_checkoutput = self.useFixture(
             fixtures.MockPatchObject(subprocess, 'check_output')).mock
