@@ -1,0 +1,10 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+1: Dirk Mueller <dirk@dmllr.de>
+Code-Review+2: yolanda.robla <yroblamo@redhat.com>
+Workflow+1: yolanda.robla <yroblamo@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 20 Apr 2017 11:23:26 +0000
+Reviewed-on: https://review.openstack.org/450634
+Project: openstack-infra/bindep
+Branch: refs/heads/master
