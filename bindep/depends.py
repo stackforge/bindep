@@ -349,6 +349,10 @@ class Emerge(Platform):
                 ['equery', 'l', '--format=\'$version\'', pkg_name],
                 stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
         except subprocess.CalledProcessError as e:
+            # The output is currently not used in the test cases.
+            # Nevertheless the next statement checks if the given
+            # parameter has the correct type.
+            e.output.decode(getpreferredencoding(False))
             if e.returncode == 3:
                 return None
             raise
