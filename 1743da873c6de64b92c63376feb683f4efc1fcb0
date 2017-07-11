@@ -1,0 +1,11 @@
+Code-Review+1: Major Hayden <major@mhtx.net>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 11 Jul 2017 17:02:00 +0000
+Reviewed-on: https://review.openstack.org/468433
+Project: openstack-infra/bindep
+Branch: refs/heads/master
