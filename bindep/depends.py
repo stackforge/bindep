@@ -194,6 +194,19 @@ class Depends(object):
                 result.append(rule)
         return result
 
+    def list_packages_csv(self, rules):
+        """Print a comma separated list of all packages that are required on
+        this platform according to the passed in rules. This is useful if we
+        want to build RPMs based on the deps listed in bindeps.txt
+
+        :param rules: A list of rules, as returned by active_rules.
+        :return: Nothing, just print a comma separated list
+        """
+        packages_csv = ''
+        for rule in rules:
+            packages_csv += rule[0] + ','
+        logging.info(packages_csv[:-1])
+
     def check_rules(self, rules):
         """Evaluate rules against the local environment.
 
