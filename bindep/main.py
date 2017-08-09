@@ -41,6 +41,9 @@ def main(depends=None):
     parser.add_option(
         "--profiles", action="store_true",
         help="List the platform and configuration profiles.")
+    parser.add_option(
+        "-l", "--list_all", dest="list_all", default=None,
+        help="List all dependencies for this platform and profile.")
     opts, args = parser.parse_args()
     if depends is None:
         depends = bindep.depends.get_depends(opts.filename)
@@ -61,6 +64,9 @@ def main(depends=None):
             profiles = ["default"]
         profiles = profiles + depends.platform_profiles()
         rules = depends.active_rules(profiles)
+        if opts.list_all:
+            depends.list_all_packages(rules, opts.list_all)
+            return 0
         errors = depends.check_rules(rules)
         for error in errors:
             if error[0] == 'missing':
