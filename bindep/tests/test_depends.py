@@ -236,6 +236,12 @@ class TestDepends(TestCase):
             [("foo", [(False, "bar"), (True, "baz"), (True, "quux")], [])],
             depends._rules)
 
+    def test_group_selectors(self):
+        depends = Depends("foo [(bar !baz) quux]\n")
+        self.assertEqual(
+            [("foo", [[(True, "bar"), (False, "baz")], (True, "quux")], [])],
+            depends._rules)
+
     def test_versions(self):
         depends = Depends("foo <=1,!=2\n")
         self.assertEqual(
