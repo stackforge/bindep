@@ -47,12 +47,13 @@ lowercase = ('a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'|'k'|'l'|'m'|'n'|'o'|'p'
 name = letterOrDigit:start (letterOrDigit|'.'|'+'|'-'|'_'|'/')+:rest
 ws = ' '+
 profile = ('!'?:neg <(lowercase|digit|':'|'-'|'.')+>:name) -> (neg!='!', name)
-profiles = '(' profile:gp1 (ws profile)+:gp2 ')' -> [gp1] + gp2
 group = profiles | profile
-selector = ws '[' ws? group:p1 (ws group)*:p2 ']' -> [p1] + p2
+grouper = (ws? group)*:g ws? -> g
+profiles = '(' grouper:g ')' -> g
+selector = ws '[' grouper:g ']' -> g
 oneversion = <('<=' | '<' | '!=' | '==' | '>=' | '>')>:rel <debversion>:v -> (
     rel, v)
-version = ws oneversion:v1 (',' oneversion)*:v2 -> [v1] + v2
+version = ws (','? oneversion)*:v -> v
 comment = ws? '#' any* '\n' -> None
 any = ~'\n' anything
 blank = ws? '\n' -> None
