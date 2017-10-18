@@ -2,6 +2,10 @@
 Installation
 ============
 
+For CentOS, install dependency::
+
+    $ yum install redhat-lsb
+
 At the command line::
 
     $ pip install bindep
