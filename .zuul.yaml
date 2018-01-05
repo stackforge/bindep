@@ -1,0 +1,24 @@
+- job:
+    name: bindep-fallback
+    description: |
+      Check that bindep can install packages from
+      openstack-infra/project-config/jenkins/data/bindep-fallback.txt.
+    roles:
+      - zuul: openstack-infra/zuul-jobs
+    run: playbooks/bindep-fallback/run.yaml
+    vars:
+      zuul_work_dir: "{{ zuul.project.src_dir }}"
+
+- job:
+    name: bindep-fallback-ubuntu-xenial
+    parent: bindep-fallback
+    nodeset: ubuntu-xenial
+
+- project:
+    name: openstack-infra/bindep
+    check:
+      jobs:
+        - bindep-fallback-ubuntu-xenial
+    gate:
+      jobs:
+        - bindep-fallback-ubuntu-xenial
