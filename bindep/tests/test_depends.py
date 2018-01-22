@@ -90,6 +90,20 @@ class TestDepends(TestCase):
                 platform_profiles,
                 Contains("platform:redhat"))
 
+    def test_detects_oraclelinux(self):
+        with self._mock_lsb("OracleServer"):
+            depends = Depends("")
+            platform_profiles = depends.platform_profiles()
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:oracleserver"))
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:rhel"))
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:redhat"))
+
     def test_detects_fedora(self):
         with self._mock_lsb("Fedora"):
             depends = Depends("")
@@ -155,6 +169,13 @@ class TestDepends(TestCase):
 
     def test_centos_implies_rpm(self):
         with self._mock_lsb("CentOS"):
+            depends = Depends("")
+            self.assertThat(
+                depends.platform_profiles(), Contains("platform:rpm"))
+            self.assertIsInstance(depends.platform, Rpm)
+
+    def test_oraclelinux_implies_rpm(self):
+        with self._mock_lsb("OracleServer"):
             depends = Depends("")
             self.assertThat(
                 depends.platform_profiles(), Contains("platform:rpm"))

@@ -295,9 +295,9 @@ class Depends(object):
             atoms.add("dpkg")
             self.platform = Dpkg()
         elif distro in ["amazonami", "centos", "redhatenterpriseserver",
-                        "fedora", "opensuseproject", "opensusetumbleweed",
-                        "suselinux"]:
-            if distro == "redhatenterpriseserver":
+                        "oracleserver", "fedora", "opensuseproject",
+                        "opensusetumbleweed", "suselinux"]:
+            if distro in ["redhatenterpriseserver", "oracleserver"]:
                 # just short alias
                 atoms.add("rhel")
             elif distro in ["opensuseproject", "opensusetumbleweed"]:
