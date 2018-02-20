@@ -19,6 +19,7 @@ from locale import getpreferredencoding
 import logging
 import os.path
 from parsley import makeGrammar
+import platform
 import subprocess
 import sys
 
@@ -275,53 +276,62 @@ class Depends(object):
         return sorted(profiles)
 
     def platform_profiles(self):
-        try:
-            output = subprocess.check_output(
-                ["lsb_release", "-cirs"],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except OSError:
-            log = logging.getLogger(__name__)
-            log.error('Unable to execute lsb_release. Is it installed?')
-            raise
-        lsbinfo = output.lower().split()
-        # NOTE(toabctl): distro can be more than one string (i.e. "SUSE LINUX")
-        codename = lsbinfo[len(lsbinfo) - 1:len(lsbinfo)][0]
-        release = lsbinfo[len(lsbinfo) - 2:len(lsbinfo) - 1][0]
-        # NOTE(toabctl): space is a delimiter for bindep, so remove the spaces
-        distro = "".join(lsbinfo[0:len(lsbinfo) - 2])
-        atoms = set([distro])
-        atoms.add("%s-%s" % (distro, codename))
-        releasebits = release.split(".")
-        for i in range(len(releasebits)):
-            atoms.add("%s-%s" % (distro, ".".join(releasebits[:i + 1])))
-        if distro in ["debian", "ubuntu"]:
-            atoms.add("dpkg")
-            self.platform = Dpkg()
-        elif distro in ["amazonami", "centos", "redhatenterpriseserver",
-                        "redhatenterpriseworkstation",
-                        "fedora", "opensuseproject", "opensusetumbleweed",
-                        "suselinux"]:
-            if distro in ["redhatenterpriseserver",
-                          "redhatenterpriseworkstation"]:
-                # just short alias
-                atoms.add("rhel")
-            elif distro in ["opensuseproject", "opensusetumbleweed"]:
-                # just short alias
-                atoms.add("opensuse")
-            # Family aliases
-            if 'suse' in distro:
-                atoms.add("suse")
-            else:
-                atoms.add("redhat")
+        if platform.system() == 'Darwin':
+            atoms = set(['darwin'])
+            # detect if brew package manager is available
+            if os.system('which brew') == 0:
+                atoms.add('brew')
+        else:
+            try:
+                output = subprocess.check_output(
+                    ["lsb_release", "-cirs"],
+                    stderr=subprocess.STDOUT) \
+                    .decode(getpreferredencoding(False))
+            except OSError:
+                log = logging.getLogger(__name__)
+                log.error('Unable to execute lsb_release. Is it installed?')
+                raise
+            lsbinfo = output.lower().split()
+            # NOTE(toabctl): distro can be more than one string
+            # (i.e. "SUSE LINUX")
+            codename = lsbinfo[len(lsbinfo) - 1:len(lsbinfo)][0]
+            release = lsbinfo[len(lsbinfo) - 2:len(lsbinfo) - 1][0]
+            # NOTE(toabctl): space is a delimiter for bindep, so remove the
+            # spaces
+            distro = "".join(lsbinfo[0:len(lsbinfo) - 2])
+            atoms = set([distro])
+            atoms.add("%s-%s" % (distro, codename))
+            releasebits = release.split(".")
+            for i in range(len(releasebits)):
+                atoms.add("%s-%s" % (distro, ".".join(releasebits[:i + 1])))
+            if distro in ["debian", "ubuntu"]:
+                atoms.add("dpkg")
+                self.platform = Dpkg()
+            elif distro in ["amazonami", "centos", "redhatenterpriseserver",
+                            "redhatenterpriseworkstation",
+                            "fedora", "opensuseproject", "opensusetumbleweed",
+                            "suselinux"]:
+                if distro in ["redhatenterpriseserver",
+                              "redhatenterpriseworkstation"]:
+                    # just short alias
+                    atoms.add("rhel")
+                elif distro in ["opensuseproject", "opensusetumbleweed"]:
+                    # just short alias
+                    atoms.add("opensuse")
+                # Family aliases
+                if 'suse' in distro:
+                    atoms.add("suse")
+                else:
+                    atoms.add("redhat")
 
-            atoms.add("rpm")
-            self.platform = Rpm()
-        elif distro in ["gentoo"]:
-            atoms.add("emerge")
-            self.platform = Emerge()
-        elif distro in ["arch"]:
-            atoms.add("pacman")
-            self.platform = Pacman()
+                atoms.add("rpm")
+                self.platform = Rpm()
+            elif distro in ["gentoo"]:
+                atoms.add("emerge")
+                self.platform = Emerge()
+            elif distro in ["arch"]:
+                atoms.add("pacman")
+                self.platform = Pacman()
         return ["platform:%s" % (atom,) for atom in sorted(atoms)]
 
 
