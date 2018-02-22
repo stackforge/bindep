@@ -1,0 +1,9 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: David Moreau Simard <dmsimard@redhat.com>
+Workflow+1: David Moreau Simard <dmsimard@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 22 Feb 2018 20:05:48 +0000
+Reviewed-on: https://review.openstack.org/543142
+Project: openstack-infra/bindep
+Branch: refs/heads/master
