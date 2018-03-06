@@ -94,6 +94,20 @@ class TestDepends(TestCase):
             platform_profiles = depends.platform_profiles()
             self.assertThat(platform_profiles, Contains("platform:darwin"))
 
+    def test_detects_oraclelinux(self):
+        with self._mock_lsb("OracleServer"):
+            depends = Depends("")
+            platform_profiles = depends.platform_profiles()
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:oracleserver"))
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:rhel"))
+            self.assertThat(
+                platform_profiles,
+                Contains("platform:redhat"))
+
     def test_detects_rhel(self):
         with self._mock_lsb("RedHatEnterpriseServer"):
             depends = Depends("")
