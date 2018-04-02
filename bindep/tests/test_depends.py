@@ -153,6 +153,18 @@ class TestDepends(TestCase):
             self.assertThat(platform_profiles,
                             Contains("platform:suse"))
 
+    def test_detects_opensuse_tumbleweed_alt(self):
+        '''Some tumbleweed installs id just as "openSUSE"'''
+        with self._mock_lsb("openSUSE"):
+            depends = Depends("")
+            platform_profiles = depends.platform_profiles()
+            self.assertThat(platform_profiles,
+                            Contains("platform:opensuse-14.04"))
+            self.assertThat(platform_profiles,
+                            Contains("platform:opensuse"))
+            self.assertThat(platform_profiles,
+                            Contains("platform:suse"))
+
     def test_detects_suse_linux(self):
         with self._mock_lsb("SUSE Linux"):
             depends = Depends("")

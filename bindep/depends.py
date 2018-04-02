@@ -307,8 +307,8 @@ class Depends(object):
             self.platform = Dpkg()
         elif distro in ["amazonami", "centos", "redhatenterpriseserver",
                         "redhatenterpriseworkstation",
-                        "fedora", "opensuseproject", "opensusetumbleweed",
-                        "suselinux"]:
+                        "fedora", "opensuse", "opensuseproject",
+                        "opensusetumbleweed", "suselinux"]:
             if distro in ["redhatenterpriseserver",
                           "redhatenterpriseworkstation"]:
                 # just short alias
