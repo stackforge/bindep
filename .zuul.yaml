@@ -21,11 +21,6 @@
     nodeset: fedora-27
 
 - job:
-    name: bindep-fallback-debian-jessie
-    parent: bindep-fallback
-    nodeset: debian-jessie
-
-- job:
     name: bindep-fallback-debian-stable
     parent: bindep-fallback
     nodeset: debian-stable
@@ -49,7 +44,6 @@
     check:
       jobs:
         - bindep-fallback-centos-7
-        - bindep-fallback-debian-jessie
         - bindep-fallback-debian-stable
         - bindep-fallback-fedora-27
         - bindep-fallback-opensuse-423
@@ -58,7 +52,6 @@
     gate:
       jobs:
         - bindep-fallback-centos-7
-        - bindep-fallback-debian-jessie
         - bindep-fallback-debian-stable
         - bindep-fallback-fedora-27
         - bindep-fallback-opensuse-423
