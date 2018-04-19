@@ -3,6 +3,8 @@
     description: |
       Check that bindep can install packages from
       openstack-infra/project-config/nodepool/elements/bindep-fallback.txt.
+    required-projects:
+      - openstack-infra/project-config
     roles:
       - zuul: openstack-infra/zuul-jobs
     run: playbooks/bindep-fallback/run.yaml
