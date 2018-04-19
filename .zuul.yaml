@@ -38,7 +38,7 @@
 - job:
     name: bindep-fallback-ubuntu-xenial
     parent: bindep-fallback
-    nodeset: ubuntu-xenial
+    nodeset: ubuntu-bionic
 
 - project:
     check:
