@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 24 Apr 2018 20:26:22 +0000
+Reviewed-on: https://review.openstack.org/563673
+Project: openstack-infra/bindep
+Branch: refs/heads/master
