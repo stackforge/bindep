@@ -83,7 +83,8 @@ class TestMain(TestCase):
         with open(fixture.path + '/other-requirements.txt', 'wt'):
             pass
         self.assertEqual(0, main())
-        self.assertEqual('', fixture.logger.output)
+        self.assertRegexpMatches(fixture.logger.output,
+                                 '^All packages required by the following')
 
     def test_specific_requirements_file(self):
         fixture = self.useFixture(MainFixture())
@@ -92,7 +93,8 @@ class TestMain(TestCase):
         with open(fixture.path + '/alternative-requirements.txt', 'wt'):
             pass
         self.assertEqual(0, main())
-        self.assertEqual('', fixture.logger.output)
+        self.assertRegexpMatches(fixture.logger.output,
+                                 '^All packages required by the following')
 
     def test_missing_specific_requirements_file(self):
         fixture = self.useFixture(MainFixture())
@@ -107,7 +109,8 @@ class TestMain(TestCase):
         fixture = self.useFixture(MainFixture())
         self.useFixture(MonkeyPatch('sys.argv', ['bindep', '--file', '-']))
         self.assertEqual(0, main())
-        self.assertEqual('', fixture.logger.output)
+        self.assertRegexpMatches(fixture.logger.output,
+                                 '^All packages required by the following')
 
     def test_specific_profile(self):
         logger = self.useFixture(FakeLogger())
@@ -117,7 +120,8 @@ class TestMain(TestCase):
         depends.active_rules.return_value = [""]
         depends.check_rules.return_value = []
         self.assertEqual(0, main(depends=depends))
-        self.assertEqual("", logger.output)
+        self.assertRegexpMatches(logger.output,
+                                 '^All packages required by the following')
         depends.platform_profiles.assert_called()
         depends.active_rules.assert_called_once_with(["myprofile",
                                                       "platform:ubuntu"])
@@ -131,7 +135,9 @@ class TestMain(TestCase):
         depends.active_rules.return_value = ["A"]
         depends.check_rules.return_value = []
         self.assertEqual(0, main(depends=depends))
-        self.assertEqual("", logger.output)
+        self.assertEqual(
+            "All packages required by the following profiles are installed:\n"
+            "  default, platform:ubuntu\n", logger.output)
         depends.platform_profiles.assert_called_once_with()
         depends.active_rules.assert_called_once_with(["default",
                                                       "platform:ubuntu"])
