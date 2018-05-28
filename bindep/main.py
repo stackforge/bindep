@@ -18,6 +18,7 @@
 import argparse
 import logging
 import sys
+import textwrap
 
 import bindep.depends
 
@@ -27,7 +28,21 @@ logging.basicConfig(
 
 
 def main(depends=None):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent('''\
+           By default, print the list of missing or out of date
+           binary packages specified within a `bindep.txt` file.
+
+           Example usage:
+
+            # Show packages required by the "test" profile
+            $ bindep -l csv test
+
+            # Install missing dependencies for the "test" and "devel" profiles
+            $ apt-get install $(bindep -b test devel)
+           '''))
+
     parser.add_argument(
         "--brief", "-b", action="store_true", dest="brief",
         help="List only missing packages one per line.")
@@ -91,6 +106,10 @@ def main(depends=None):
                         pkg, version, constraint)
     if errors:
         return 1
+    logging.info(
+        "All packages required by the following profiles are installed:")
+    logging.info("  %s" % ', '.join(profiles))
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
