@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sat, 23 Jun 2018 12:38:35 +0000
+Reviewed-on: https://review.openstack.org/564650
+Project: openstack-infra/bindep
+Branch: refs/heads/master
