@@ -523,6 +523,7 @@ class Pacman(Platform):
         elements = output.strip().split(' ')
         return elements[1]
 
+
 class Apk(Platform):
     """apk (Alpine Linux) specific implementation.
 
