@@ -384,6 +384,9 @@ class Depends(object):
         elif distro_id in ["arch"]:
             atoms.add("pacman")
             self.platform = Pacman()
+        elif distro_id in ["alpine"]:
+            atoms.add("apk")
+            self.platform = Apk()
         return ["platform:%s" % (atom,) for atom in sorted(atoms)]
 
 
