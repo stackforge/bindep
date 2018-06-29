@@ -520,6 +520,29 @@ class Pacman(Platform):
         elements = output.strip().split(' ')
         return elements[1]
 
+class Apk(Platform):
+    """apk (Alpine Linux) specific implementation.
+
+    This shells out to apk
+    """
+
+    def get_pkg_version(self, pkg_name):
+        try:
+            output = subprocess.check_output(
+                ['apk', 'version', pkg_name],
+                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 3:
+                return None
+            raise
+        # output looks like
+        # version
+        output = output.strip()
+        elements = output.split(' ')
+        if len(elements) < 3:
+            return None
+        return elements[2]
+
 
 def _eval_diff(operator, diff):
     """Return the boolean result for operator given diff.
