@@ -36,6 +36,7 @@ from bindep.depends import Dpkg
 from bindep.depends import Emerge
 from bindep.depends import Pacman
 from bindep.depends import Rpm
+from bindep.depends import Apk
 
 
 # NOTE(notmorgan): In python3 subprocess.check_output returns bytes not
@@ -184,6 +185,12 @@ class TestDepends(TestCase):
             self.assertThat(
                 depends.platform_profiles(), Contains("platform:ubuntu"))
 
+    def test_detects_apk(self):
+        with DistroFixture("Apk"):
+            depends = Depends("")
+            self.assertThat(
+                depends.platform_profiles(), Contains("platform:alpine"))
+
     def test_detects_release(self):
         with DistroFixture("Ubuntu"):
             depends = Depends("")
@@ -251,6 +258,13 @@ class TestDepends(TestCase):
             self.assertThat(
                 depends.platform_profiles(), Contains("platform:dpkg"))
             self.assertIsInstance(depends.platform, Dpkg)
+
+    def test_alpine_implies_apk(self):
+        with DistroFixture("Alpine"):
+            depends = Depends("")
+            self.assertThat(
+                depends.platform_profiles(), Contains("platform:alpine"))
+            self.assertIsInstance(depends.platform, Apk)
 
     def test_arch_implies_pacman(self):
         with DistroFixture("Arch"):
@@ -456,6 +470,7 @@ class TestDepends(TestCase):
             installH [!platform:dpkg !platform:rpm test]
             installI [!platform:dpkg !platform:rpm !test]
             installJ [platform:dpkg !platform:rpm !test]
+            installK [platform:apk]
             """))
 
         rules_dpkg = depends.active_rules(['platform:dpkg'])
@@ -515,6 +530,7 @@ class TestDepends(TestCase):
             installH [!platform:dpkg !platform:rpm test]
             installI [!platform:dpkg !platform:rpm !test]
             installJ [platform:dpkg !platform:rpm !test]
+            installK [platform:apk]
             """))
 
         # Platform-only rules and rules with no platform are activated
@@ -591,6 +607,50 @@ class TestDpkg(TestCase):
         mocked_checkoutput.assert_called_once_with(
             ["dpkg-query", "-W", "-f",
              "${Package} ${Status} ${Version}\n", "foo"],
+            stderr=subprocess.STDOUT)
+
+
+class TestApk(TestCase):
+
+    def test_not_installed(self):
+        platform = Apk()
+        mock_checkoutput = self.useFixture(
+            fixtures.MockPatchObject(
+                subprocess,
+                'check_output',
+                return_value=b"OK: 19 MiB in 17 packages\n")
+        ).mock
+        self.assertEqual(None, platform.get_pkg_version("foo"))
+        mock_checkoutput.assert_called_once_with(
+            ["apk", "version", "foo"],
+            stderr=subprocess.STDOUT)
+
+    def test_unknown_package(self):
+        platform = Apk()
+        mock_checkoutput = self.useFixture(
+            fixtures.MockPatchObject(subprocess, 'check_output')).mock
+
+        def _side_effect_raise(*args, **kwargs):
+            raise subprocess.CalledProcessError(
+                1, [], b"ERROR: unsatisfiable constraints:\nfoo (missing)\n")
+
+        mock_checkoutput.side_effect = _side_effect_raise
+        self.assertEqual(None, platform.get_pkg_version("foo"))
+        mock_checkoutput.assert_called_once_with(
+            ["apk", "version", "foo"],
+            stderr=subprocess.STDOUT)
+
+    def test_installed_version(self):
+        platform = Apk()
+        mocked_checkoutput = self.useFixture(
+            fixtures.MockPatchObject(
+                subprocess,
+                'check_output',
+                return_value=b"OK: 19 MiB in 17 packages\n")
+        ).mock
+        self.assertEqual("4.0.0", platform.get_pkg_version("foo"))
+        mocked_checkoutput.assert_called_once_with(
+            ["apk", "version", "foo"],
             stderr=subprocess.STDOUT)
 
 
