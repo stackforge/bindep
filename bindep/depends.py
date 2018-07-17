@@ -324,7 +324,8 @@ class Depends(object):
                            "redhatenterpriseworkstation",
                            "fedora",
                            "opensuseproject", "opensuse",
-                           "opensuse-tumbleweed", "sles", "suselinux"]:
+                           "opensuse-tumbleweed", "sles", "suselinux",
+                           "ol"]:
             # Distro aliases
             if distro_id in ["redhatenterpriseserver",
                              "redhatenterpriseworkstation"]:
