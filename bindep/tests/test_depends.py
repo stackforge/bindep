@@ -216,6 +216,12 @@ class TestDepends(TestCase):
             self.assertThat(
                 depends.platform_profiles(), Contains("platform:alpine"))
 
+    def test_detects_oraclelinux(self):
+        with DistroFixture("oraclelinux"):
+            depends = Depends("")
+            self.assertThat(
+                depends.platform_profiles(), Contains("platform:rpm"))
+
     def test_detects_release(self):
         with DistroFixture("Ubuntu"):
             depends = Depends("")
