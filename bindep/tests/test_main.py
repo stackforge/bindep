@@ -69,6 +69,23 @@ class TestMain(TestCase):
             foo
             """), logger.output)
 
+    def test_profiles_lists_real_profiles(self):
+        logger = self.useFixture(FakeLogger())
+        self.useFixture(MonkeyPatch('sys.argv',
+                                    ['bindep','-f', 'bindep-example.txt','--profiles']))
+
+        self.assertEqual(0, main())
+        self.assertEqual(dedent("""\
+            Platform profiles:
+            platform:dpkg
+            platform:rpm
+
+            Configuration profiles:
+            bar
+            foo
+            baz
+            """), logger.output)
+
     def test_missing_default_requirements_file(self):
         fixture = self.useFixture(MainFixture())
         self.useFixture(MonkeyPatch('sys.argv', ['bindep']))

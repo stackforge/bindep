@@ -1,0 +1,4 @@
+erlang-base-hipe  [(foo bar baz)]
+git-core          [platform:dpkg]
+git               [platform:rpm]
+
