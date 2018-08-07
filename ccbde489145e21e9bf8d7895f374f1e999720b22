@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 07 Aug 2018 13:01:24 +0000
+Reviewed-on: https://review.openstack.org/588253
+Project: openstack-infra/bindep
+Branch: refs/heads/master
