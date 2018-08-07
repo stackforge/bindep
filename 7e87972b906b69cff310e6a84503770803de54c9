@@ -1,0 +1,11 @@
+Code-Review+1: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 07 Aug 2018 13:01:23 +0000
+Reviewed-on: https://review.openstack.org/586038
+Project: openstack-infra/bindep
+Branch: refs/heads/master
