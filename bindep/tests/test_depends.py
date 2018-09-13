@@ -715,32 +715,43 @@ class TestPacman(TestCase):
 
 class TestApk(TestCase):
 
-    def test_unknown_package(self):
+    @mock.patch('subprocess.Popen')
+    def test_unknown_package(self, mock_popen):
         platform = Apk()
 
-        def _side_effect_raise(*args, **kwargs):
-            raise subprocess.CalledProcessError(
-                1, [], b"Installed: Available:")
-
-        mock_checkoutput = self.useFixture(
-            fixtures.MockPatchObject(subprocess, "check_output")).mock
-        mock_checkoutput.side_effect = _side_effect_raise
+        proc_mock = mock.Mock()
+        proc_mock.communicate.return_value = (b'Installed: Available:\n',b'')
+        mock_popen.returncode = 1
+        mock_popen.return_value = proc_mock
 
         self.assertEqual(None, platform.get_pkg_version("foo"))
-        mock_checkoutput.assert_called_once_with(
-            ['apk', 'version', 'foo'],
-            stderr=subprocess.STDOUT)
+        mock_popen.assert_called_once_with(
+            ['apk', 'version', 'foo'], stdout=subprocess.PIPE)
         self.assertEqual(None, platform.get_pkg_version("foo"))
 
-    def test_installed_version(self):
+    @mock.patch('subprocess.Popen')
+    def test_installed_version(self, mock_popen):
         platform = Apk()
-        mock_checkoutput = self.useFixture(
-            fixtures.MockPatchObject(subprocess, "check_output")).mock
-        mock_checkoutput.return_value = b'Insd: Able: foo-4.0.0-r1 = 4.0.0-r1'
+
+        proc_mock = mock.Mock()
+        proc_mock.communicate.return_value = (
+            b'Insd: Able: foo-4.0.0-r1 = 4.0.0-r1', b'')
+        mock_popen.return_value = proc_mock
         self.assertEqual('4.0.0-r1', platform.get_pkg_version("foo"))
-        mock_checkoutput.assert_called_once_with(
-            ['apk', 'version', 'foo'],
-            stderr=subprocess.STDOUT)
+        mock_popen.assert_called_once_with(
+            ['apk', 'version', 'foo'], stdout=subprocess.PIPE)
+
+    @mock.patch('subprocess.Popen')
+    def test_handles_warnings(self, mock_popen):
+        platform = Apk()
+        process_mock = mock.Mock()
+        values = b'Installed:   Available:\n'
+        warnings = b'WARNING: Ignoring APKINDEX.blah\nWARNING2: blah blah\n'
+        process_mock.communicate.return_value = (values, warnings)
+        mock_popen.return_value = process_mock
+        self.assertIsNone(platform.get_pkg_version("bar"))
+        mock_popen.assert_called_once_with(
+            ['apk', 'version', 'bar'], stdout=subprocess.PIPE)
 
 
 class TestRpm(TestCase):

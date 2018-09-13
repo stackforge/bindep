@@ -546,14 +546,12 @@ class Apk(Platform):
     """
 
     def get_pkg_version(self, pkg_name):
-        try:
-            output = subprocess.check_output(
-                ['apk', 'version', pkg_name],
-                stderr=subprocess.STDOUT).decode(getpreferredencoding(False))
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                return None
-            raise
+        apk = subprocess.Popen(
+            ['apk', 'version', pkg_name], stdout=subprocess.PIPE)
+        output, _ = apk.communicate()
+        if apk.returncode == 1:
+            return None
+        output = output.decode(getpreferredencoding(False))
         # output looks like
         # version
         output = output.strip()
