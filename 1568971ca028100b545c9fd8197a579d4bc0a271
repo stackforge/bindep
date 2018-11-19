@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Workflow+1: Joshua Hesketh <josh@nitrotech.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 19 Nov 2018 06:21:11 +0000
+Reviewed-on: https://review.openstack.org/617282
+Project: openstack-infra/bindep
+Branch: refs/heads/master
