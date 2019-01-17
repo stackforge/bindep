@@ -35,6 +35,25 @@
     parent: bindep-fallback
     nodeset: ubuntu-xenial
 
+- job:
+    name: bindep-build-image
+    description: |
+      Build a docker image.
+
+      See the `role documentation
+      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-build-docker-image>`_
+      for details.
+    allowed-projects: openstack-infra/bindep
+    pre-run: playbooks/build-image/pre.yaml
+    run: playbooks/build-image/run.yaml
+    vars:
+      docker_images:
+        - context: .
+          repository: opendevorg/bindep
+    files:
+      - Dockerfile
+      - docker/scripts/.*
+
 - project:
     check:
       jobs:
@@ -43,6 +62,7 @@
         - bindep-fallback-opensuse-150
         - bindep-fallback-ubuntu-trusty
         - bindep-fallback-ubuntu-xenial
+        - bindep-build-image
     gate:
       jobs:
         - bindep-fallback-centos-7
@@ -50,3 +70,4 @@
         - bindep-fallback-opensuse-150
         - bindep-fallback-ubuntu-trusty
         - bindep-fallback-ubuntu-xenial
+        - bindep-build-image
