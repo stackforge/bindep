@@ -16,6 +16,11 @@
     nodeset: centos-7
 
 - job:
+    name: bindep-fallback-fedora-28
+    parent: bindep-fallback
+    nodeset: fedora-28
+
+- job:
     name: bindep-fallback-opensuse-423
     parent: bindep-fallback
     nodeset: opensuse-423
@@ -39,6 +44,7 @@
     check:
       jobs:
         - bindep-fallback-centos-7
+        - bindep-fallback-fedora-28
         - bindep-fallback-opensuse-423
         - bindep-fallback-opensuse-150
         - bindep-fallback-ubuntu-trusty
@@ -46,6 +52,7 @@
     gate:
       jobs:
         - bindep-fallback-centos-7
+        - bindep-fallback-fedora-28
         - bindep-fallback-opensuse-423
         - bindep-fallback-opensuse-150
         - bindep-fallback-ubuntu-trusty
