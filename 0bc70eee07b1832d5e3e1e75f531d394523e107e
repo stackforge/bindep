@@ -1,0 +1,10 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: wes hayutin <whayutin@redhat.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 11 Feb 2019 13:55:37 +0000
+Reviewed-on: https://review.openstack.org/635576
+Project: openstack-infra/bindep
+Branch: refs/heads/master
