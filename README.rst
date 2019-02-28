@@ -143,6 +143,19 @@ following example::
     openssh-server [platform:redhat]
     openssh [platform:suse]
 
+You can also use the distribution package manager to differentiate between
+distros that switched from one to another at some point::
+
+    python3-lxml [(platform:redhat platform:dnf)]
+    python-lxml [(platform:redhat platform:yum)]
+
+The example above with install lxml python3 module on systems like Fedora>27,
+CentOS>7 and RHEL>7 and for python2 on older systems which are using yum as
+their official package manager. Please remark that the dnf and yum atoms are
+added hardcoded based on operating systems version and they do not change if
+you install multiple package managers on a system. This means that you should
+not expect to see both ``dnf`` and ``yum`` as defined on the same system.
+
 To select Python3 development packages, the OpenStack CI default file uses::
 
     python3-all-dev [platform:dpkg !platform:ubuntu-precise]

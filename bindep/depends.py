@@ -22,7 +22,11 @@ from parsley import makeGrammar
 import platform
 import subprocess
 import sys
-
+# packaging is newer, usually available but not guaranteed
+try:
+    from packaging.version import parse as as_ver
+except ImportError:
+    from distutils.version import LooseVersion as as_ver
 import distro
 
 
@@ -315,6 +319,7 @@ class Depends(object):
         # NOTE(toabctl): distro can be more than one string (i.e. "SUSE LINUX")
         codename = distro.codename().lower()
         release = distro.version().lower()
+        release_version = as_ver(release)
         # NOTE(toabctl): space is a delimiter for bindep, so remove the spaces
         distro_id = "".join(distro_id.split()).lower()
         atoms = set([distro_id])
@@ -338,12 +343,14 @@ class Depends(object):
                 atoms.add("rhel")
                 atoms.update(self.codenamebits("rhel", codename))
                 atoms.update(self.releasebits("rhel", release))
+                atoms.add("yum" if release_version < as_ver("8") else "dnf")
             elif distro_id == 'rhel' and 'server' in distro.name().lower():
                 atoms.add("redhatenterpriseserver")
                 atoms.update(self.codenamebits("redhatenterpriseserver",
                                                codename))
                 atoms.update(self.releasebits("redhatenterpriseserver",
                                               release))
+                atoms.add("yum" if release_version < as_ver("8") else "dnf")
             elif (distro_id == 'rhel' and
                     'workstation' in distro.name().lower()):
                 atoms.add("redhatenterpriseworkstation")
@@ -351,6 +358,7 @@ class Depends(object):
                                                codename))
                 atoms.update(self.releasebits("redhatenterpriseworkstation",
                                               release))
+                atoms.add("yum" if release_version < as_ver("8") else "dnf")
             elif "amzn" in distro_id:
                 atoms.add("amazonami")
                 atoms.update(self.codenamebits("amazonami", codename))
@@ -367,6 +375,7 @@ class Depends(object):
                 atoms.add("opensuseproject")
                 atoms.update(self.codenamebits("opensuseproject", codename))
                 atoms.update(self.releasebits("opensuseproject", release))
+                atoms.add("zypper")
             elif "sles" in distro_id:
                 atoms.add("suselinux")
                 atoms.update(self.codenamebits("suselinux", codename))
@@ -375,6 +384,10 @@ class Depends(object):
                 atoms.add("sles")
                 atoms.update(self.codenamebits("sles", codename))
                 atoms.update(self.releasebits("sles", release))
+            elif "fedora" in distro_id:
+                atoms.add("dnf")
+            elif "centos" in distro_id:
+                atoms.add("yum" if release_version < as_ver("8") else "dnf")
 
             # Family aliases
             if 'suse' in distro_id or distro_id == 'sles':

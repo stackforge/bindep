@@ -85,7 +85,10 @@ python-devel [platform:rpm]
 dev-lang/python [platform:gentoo]
 python-libvirt [platform:dpkg]
 python-lxml [!platform:gentoo !platform:fedora]
-python2-lxml [platform:fedora]
+# dnf covers CentOS>=8, Fedora>=28, RHEL>=8
+python-lxml [(platform:redhat platform:yum)]
+# yum covers CentOS<8, Fedora<28, RHEL<8
+python3-lxml [(platform:redhat platform:dnf)]
 dev-python/lxml [platform:gentoo]
 # Note that python3-all-dev includes python3-all, added
 # both here for documentary purpose.
