@@ -1,0 +1,11 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+1: Marios Andreou <marios@redhat.com>
+Code-Review+1: Quique Llorente <ellorent@redhat.com>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Workflow+1: Joshua Hesketh <josh@nitrotech.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 28 Feb 2019 11:51:43 +0000
+Reviewed-on: https://review.openstack.org/635590
+Project: openstack-infra/bindep
+Branch: refs/heads/master
