@@ -143,6 +143,17 @@ following example::
     openssh-server [platform:redhat]
     openssh [platform:suse]
 
+If you need to distinguish between operating systems where python2 or python3
+is the official interpreter, you can use `base-py2` and `base-py3` labels.
+Keep in mind that only one would be exposed for a specific operating system
+even if the system could support installation of multiple python versions.
+
+    python3-lxml [(platform:redhat platform:base-py3)]
+    python-lxml [(platform:redhat platform:base-py2)]
+
+The example above will install lxml python modules on official python used
+by platform.
+
 To select Python3 development packages, the OpenStack CI default file uses::
 
     python3-all-dev [platform:dpkg !platform:ubuntu-precise]

@@ -22,7 +22,11 @@ from parsley import makeGrammar
 import platform
 import subprocess
 import sys
-
+# packaging is newer, usually available but not guaranteed
+try:
+    from packaging.version import parse as as_ver
+except ImportError:
+    from distutils.version import LooseVersion as as_ver
 import distro
 
 
@@ -60,6 +64,8 @@ comment = ws? '#' any* '\n' -> None
 any = ~'\n' anything
 blank = ws? '\n' -> None
 """
+PY2 = "base-py2"
+PY3 = "base-py3"
 
 
 def get_depends(filename=None):
@@ -303,6 +309,7 @@ class Depends(object):
             # detect available macos package managers
             if os.system('which brew >/dev/null') == 0:
                 atoms.add('brew')
+                atoms.add(PY2)
                 self.platform = Brew()
             return ["platform:%s" % (atom,) for atom in sorted(atoms)]
         distro_id = distro.id()
@@ -315,6 +322,7 @@ class Depends(object):
         # NOTE(toabctl): distro can be more than one string (i.e. "SUSE LINUX")
         codename = distro.codename().lower()
         release = distro.version().lower()
+        release_version = as_ver(release)
         # NOTE(toabctl): space is a delimiter for bindep, so remove the spaces
         distro_id = "".join(distro_id.split()).lower()
         atoms = set([distro_id])
@@ -338,12 +346,14 @@ class Depends(object):
                 atoms.add("rhel")
                 atoms.update(self.codenamebits("rhel", codename))
                 atoms.update(self.releasebits("rhel", release))
+                atoms.add(PY2 if release_version < as_ver("8") else PY3)
             elif distro_id == 'rhel' and 'server' in distro.name().lower():
                 atoms.add("redhatenterpriseserver")
                 atoms.update(self.codenamebits("redhatenterpriseserver",
                                                codename))
                 atoms.update(self.releasebits("redhatenterpriseserver",
                                               release))
+                atoms.add(PY2 if release_version < as_ver("8") else PY3)
             elif (distro_id == 'rhel' and
                     'workstation' in distro.name().lower()):
                 atoms.add("redhatenterpriseworkstation")
@@ -351,6 +361,7 @@ class Depends(object):
                                                codename))
                 atoms.update(self.releasebits("redhatenterpriseworkstation",
                                               release))
+                atoms.add(PY2 if release_version < as_ver("8") else PY3)
             elif "amzn" in distro_id:
                 atoms.add("amazonami")
                 atoms.update(self.codenamebits("amazonami", codename))
@@ -375,6 +386,10 @@ class Depends(object):
                 atoms.add("sles")
                 atoms.update(self.codenamebits("sles", codename))
                 atoms.update(self.releasebits("sles", release))
+            elif "fedora" in distro_id:
+                atoms.add(PY2 if release_version < as_ver("23") else PY3)
+            elif "centos" in distro_id:
+                atoms.add(PY2 if release_version < as_ver("8") else PY3)
 
             # Family aliases
             if 'suse' in distro_id or distro_id == 'sles':
